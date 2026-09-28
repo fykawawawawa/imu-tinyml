@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "imu-tinyml-har"
+version = "0.1.0"
+description = "面向资源受限设备的 IMU 人体活动识别参考实现"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "numpy==2.3.5",
+]
+
+[project.optional-dependencies]
+# 特征提取、单元测试和静态检查所需的轻量环境。
+dev = [
+    "pytest==9.0.2",
+    "ruff==0.13.2",
+]
+# PyTorch MLP 训练、标准化、指标评估和结果绘图。
+train = [
+    "torch==2.14.0",
+    "scikit-learn==1.9.1",
+    "matplotlib==3.10.8",
+]
+# Keras/TFLite 转换与全 INT8 训练后量化。
+convert = [
+    "tensorflow==2.21.0",
+]
+# README 所描述完整 Python 流水线的统一安装入口。
+all = [
+    "pytest==9.0.2",
+    "ruff==0.13.2",
+    "torch==2.14.0",
+    "scikit-learn==1.9.1",
+    "matplotlib==3.10.8",
+    "tensorflow==2.21.0",
+]
+
+[tool.setuptools.packages.find]
+include = ["feature_ref*", "models*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests/python"]
+addopts = "-ra"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

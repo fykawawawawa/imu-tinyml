@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Build outputs
+build/
+cmake-build-*/
+*.o
+*.obj
+*.a
+*.lib
+*.exe
+
+# Datasets and generated artifacts
+data/raw/*
+data/processed/*
+artifacts/*
+benchmark/*.csv
+
+# Generated model artifacts; keep model source code under version control.
+models/checkpoints/
+models/exported/
+models/*.pt
+models/*.pth
+models/*.onnx
+models/*.tflite
+models/*.keras
+models/*.h5
+
+# Keep directory placeholders and documentation
+!data/raw/.gitkeep
+!data/raw/README.md
+!data/processed/.gitkeep
+!data/processed/README.md
+!artifacts/.gitkeep
+!artifacts/README.md
+!benchmark/.gitkeep
+!benchmark/README.md
+
+# IDE and OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
