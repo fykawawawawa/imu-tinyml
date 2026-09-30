@@ -1,0 +1,16 @@
+# TinyMLP 训练轮数和批次大小。
+epochs: 100
+batch_size: 64
+
+# Adam 优化器参数。
+learning_rate: 0.001
+weight_decay: 0.0001
+
+# 验证损失至少下降 min_delta 才算改善；连续 patience 轮未改善则早停。
+patience: 15
+min_delta: 0.0001
+
+# 可复现性、数据加载进程数和训练设备。
+seed: 42
+num_workers: 0
+device: auto

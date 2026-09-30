@@ -67,3 +67,31 @@ python -c "import numpy, torch, sklearn, tensorflow; print('environment ok')"
 Python 虚拟环境不负责安装 C++ 编译器、CMake 或 TensorFlow Lite Micro 源码。实现 README
 中的桌面端 TFLM `MicroInterpreter` 时，还需要单独配置支持 C++17 的编译器和 CMake；这些
 依赖应由后续固件构建配置管理，避免与 Python 包环境混在一起。
+
+## Docker Desktop + WSL2 的 TFLM 环境
+
+Windows 主机使用 Docker Desktop 的 WSL2 Linux 容器后端，不需要再安装完整的 Ubuntu
+虚拟机。仓库根目录的 `compose.yaml` 使用 TFLM 官方 CI 镜像
+`ghcr.io/tflm-bot/tflm-ci:0.6.7`，其中包含 Clang、Bazel 和 QEMU。TFLM 源码保存在 Docker
+命名卷 `imu-process-tflm-source` 中，与数据集、Python 虚拟环境和训练产物隔离。
+
+首次配置并运行官方 `hello_world` 冒烟测试：
+
+```powershell
+.\scripts\setup_tflm_docker.ps1
+```
+
+只初始化环境、不编译冒烟测试：
+
+```powershell
+.\scripts\setup_tflm_docker.ps1 -SkipSmokeTest
+```
+
+进入容器终端：
+
+```powershell
+docker compose run --rm tflm bash
+```
+
+容器内的项目路径为 `/workspace`，TFLM 源码路径为 `/opt/tflm`。源码固定到提交
+`cd32a519356a05615e58001637ee25f73b009c86`，以保证构建结果可复现。

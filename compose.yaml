@@ -1,0 +1,15 @@
+services:
+  tflm:
+    image: ghcr.io/tflm-bot/tflm-ci:0.6.7
+    working_dir: /workspace
+    init: true
+    stdin_open: true
+    tty: true
+    volumes:
+      - .:/workspace
+      - tflm-source:/opt/tflm
+    command: ["sleep", "infinity"]
+
+volumes:
+  tflm-source:
+    name: imu-process-tflm-source

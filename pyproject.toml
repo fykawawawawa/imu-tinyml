@@ -23,6 +23,7 @@ train = [
     "torch==2.14.0",
     "scikit-learn==1.9.1",
     "matplotlib==3.10.8",
+    "PyYAML==6.0.3",
 ]
 # Keras/TFLite 转换与全 INT8 训练后量化。
 convert = [
@@ -35,11 +36,12 @@ all = [
     "torch==2.14.0",
     "scikit-learn==1.9.1",
     "matplotlib==3.10.8",
+    "PyYAML==6.0.3",
     "tensorflow==2.21.0",
 ]
 
 [tool.setuptools.packages.find]
-include = ["feature_ref*", "models*"]
+include = ["feature_ref*", "models*", "training*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests/python"]
