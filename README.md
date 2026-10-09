@@ -4,19 +4,17 @@
 轻量时域特征，训练 `39 -> 32 -> 16 -> 6` 的 PyTorch MLP，将模型转换为全 INT8
 TensorFlow Lite，并在桌面端通过 TensorFlow Lite Micro 完成推理验证。
 
-## 当前状态
+## 实现范围
 
-| 模块 | 状态 | 说明 |
-| --- | --- | --- |
-| 数据读取 | 已完成 | 读取九路信号、标签和受试者编号，校验窗口与样本对齐 |
-| 特征工程 | 已完成 | 提取固定顺序的 39 维特征，并保存标准化参数 |
-| 模型训练 | 已完成 | 训练、验证、早停、指标记录和最佳检查点保存 |
-| 测试集评估 | 已完成 | 总体/逐类指标、分类报告和混淆矩阵 |
-| Keras 转换 | 已完成 | PyTorch 权重迁移、落盘重载及全测试集 logits 对齐 |
-| 浮点 TFLite | 已完成 | Keras 到 FP32 FlatBuffer 转换及全测试集 logits 对齐 |
-| INT8 基线 | 已完成 | 使用全部原始标准化训练输入校准全 INT8 模型 |
-| 裁剪校准 | 待比较 | 已预留统一上下界策略，后续比较 `±8`、`±6` 等方案 |
-| TFLM 推理 | 已完成（桌面） | MicroInterpreter、静态 arena 和六类 Golden Vector 的 INT8 输出已验证 |
+| 模块 | 本仓库实现 |
+| --- | --- |
+| 数据与特征 | 读取 UCI HAR 九路窗口信号，按受试者划分数据，提取并标准化 39 维特征 |
+| 训练与评估 | 训练 TinyMLP，执行早停，在官方测试集生成分类指标和混淆矩阵 |
+| 模型转换 | 完成 PyTorch、Keras、FP32 TFLite 和全 INT8 TFLite 的逐级一致性检查 |
+| 桌面 TFLM | 使用静态 tensor arena 完成六类 Golden Vector 校验、内存分析和延迟测试 |
+
+本仓库不包含真实 MCU 固件、传感器驱动、功耗测量或动态频率调节。C++ 推理入口接收已经
+标准化的 39 维特征，原始 IMU 信号的滤波和特征提取仍由 Python 完成。
 
 核心流程：
 
@@ -29,7 +27,7 @@ TensorFlow Lite，并在桌面端通过 TensorFlow Lite Micro 完成推理验证
     -> 官方 test 最终评估
     -> 等价 Keras Dense/ReLU
     -> INT8 TFLite
-    -> TFLM 推理
+    -> 桌面 TFLM 推理验证
 ```
 
 ## 结果摘要
@@ -121,8 +119,8 @@ python -m training.export_int8_tflite
 
 默认输出为 `models/exported/best_model_int8_baseline.tflite` 和
 `models/exported/best_model_int8_baseline_report.json`。校准只使用训练分区，候选模型在
-验证分区上与 FP32 TFLite 比较。转换入口已预留裁剪策略；后续实验应为不同策略指定独立
-输出路径，例如同时传入 `--clip-min -8 --clip-max 8`。
+验证分区上与 FP32 TFLite 比较。转换命令也支持通过 `--clip-min` 和 `--clip-max` 指定
+校准输入的统一裁剪范围；不同设置应使用独立输出路径，避免覆盖基线模型。
 
 在官方测试集上对比 FP32 与 INT8 TFLite，并生成与原评估目录同结构的报告：
 
@@ -252,17 +250,18 @@ training.log     控制台同步输出的文本日志
 CSV/PNG 和 `evaluation.log`。INT8 TFLite 对比评估写入 `artifacts/int8_evaluation/`，
 文件结构相同，其中分类报告和混淆矩阵对应 INT8 模型。
 
-数据、处理结果、检查点和其他生成物均由 `.gitignore` 排除。
+原始数据、处理结果、检查点、导出模型和评估报告由 `.gitignore` 排除。桌面 TFLM 使用的
+INT8 模型字节数组和 Golden Vector 提交到仓库，以便不依赖本地训练产物复现 C++ 验证。
 
 ## 目录
 
 ```text
 feature_ref/    Python 39 维特征参考实现与固定 schema
 training/       原始数据读取、预处理和 PyTorch 训练
-models/         TinyMLP 定义、检查点及后续导出模型
+models/         TinyMLP 定义及本地生成的检查点和导出模型
 configs/        训练与转换配置
-firmware/       C++ 特征和 TFLM 推理代码
-tests/          Python 单元测试与后续 golden vectors
+firmware/       桌面 TFLM 推理、Golden Vector、内存和延迟测试
+tests/          Python 单元测试
 data/           原始数据和处理后数据
 benchmark/      精度、体积、内存和延迟结果
 artifacts/      图表与其他实验产物
@@ -272,7 +271,7 @@ scripts/        环境、训练、转换和验证入口
 
 ## 部署边界
 
-当前项目尚未在真实 MCU 上部署。后续桌面端 TFLM 结果只代表 host simulation，不能作为
+项目尚未在真实 MCU 上部署。桌面端 TFLM 结果只代表 host simulation，不能作为
 真实板端延迟、RAM、Flash、功耗或动态频率表现。数据来自腰部固定手机和受控实验环境，
 模型结果也不能直接代表手腕、鞋部或自由放置设备上的效果。
 

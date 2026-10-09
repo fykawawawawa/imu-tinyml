@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "imu-tinyml-har"
 version = "0.1.0"
-description = "面向资源受限设备的 IMU 人体活动识别参考实现"
+description = "基于 UCI HAR 的轻量 IMU 活动识别与桌面 TFLM 验证"
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.12,<3.13"
@@ -30,7 +30,7 @@ train = [
 convert = [
     "tensorflow==2.21.0",
 ]
-# README 所描述完整 Python 流水线的统一安装入口。
+# 完整 Python 流水线。
 all = [
     "pytest==9.0.2",
     "ruff==0.13.2",

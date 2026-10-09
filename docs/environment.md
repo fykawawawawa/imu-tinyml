@@ -14,8 +14,8 @@ TensorFlow CPU/TFLite 转换的要求。依赖版本统一定义在根目录 `py
 
 原生 Windows TensorFlow 2.11 之后仅支持 CPU。这个项目只用 TensorFlow 执行模型转换
 和桌面端校验，因此不依赖 TensorFlow GPU。默认安装的 PyTorch 也是 CPU 版本，以可复现
-和跨机器运行优先；若后续确实需要 GPU 训练，应按本机 CUDA 版本使用 PyTorch 官方安装器
-替换对应 wheel，而不要直接修改其他项目依赖。
+和跨机器运行优先。需要 GPU 训练时，按本机 CUDA 版本使用 PyTorch 官方安装器替换对应
+wheel，其余依赖保持不变。
 
 ## 自动配置
 
@@ -64,9 +64,9 @@ python -c "import numpy, torch, sklearn, tensorflow; print('environment ok')"
 
 ## 非 Python 依赖
 
-Python 虚拟环境不负责安装 C++ 编译器、CMake 或 TensorFlow Lite Micro 源码。实现 README
-中的桌面端 TFLM `MicroInterpreter` 时，还需要单独配置支持 C++17 的编译器和 CMake；这些
-依赖应由后续固件构建配置管理，避免与 Python 包环境混在一起。
+Python 虚拟环境不安装 C++ 编译器、CMake 或 TensorFlow Lite Micro 源码。桌面端 TFLM
+验证使用 `compose.yaml` 固定工具链镜像，并通过 `firmware/Makefile` 构建；CMake 文件用于
+已有本地 TFLM 源码和静态库的环境。
 
 ## Docker Desktop + WSL2 的 TFLM 环境
 
@@ -157,5 +157,5 @@ docker compose exec tflm bash -lc "cd /workspace && make -C firmware benchmark-l
 
 输出分别包含纯 `MicroInterpreter::Invoke()` 和当前特征级端到端 `RunInference()` 的
 mean、P50、P95、P99 及最大/最小值。端到端计时包含输入检查、INT8 量化、推理、输出
-反量化和 `argmax`，不包含尚未接入 C++ 的原始 IMU 特征提取与标准化。固定单核的五轮
+反量化和 `argmax`，不包含原始 IMU 特征提取与标准化。固定单核的五轮
 实测结果及完整环境记录见 `benchmark/host_latency.md`。

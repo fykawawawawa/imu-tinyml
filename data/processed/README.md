@@ -1,4 +1,4 @@
 # Processed data
 
-预留给生成的特征、标签、标准化参数和数据划分结果。
-
+`python -m training.preprocess` 在本目录生成 `train.npz`、`val.npz`、`test.npz`、
+`standardization.npz` 和 `metadata.json`。这些文件不提交到 Git。

@@ -16,5 +16,5 @@ tensorflow==2.21.0
 pytest==9.0.2
 ruff==0.13.2
 
-# 以可编辑模式安装本项目的 feature_ref、models 和 training 包
+# 安装项目包
 -e .

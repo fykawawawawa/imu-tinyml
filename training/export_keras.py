@@ -14,7 +14,7 @@
 3. 使用官方测试集比较内存中 PyTorch/Keras 模型的 logits；
 4. 将 Keras 模型保存、重新加载并再次对齐，排除序列化造成的差异。
 
-这里生成的 Keras 模型是后续 TFLite 转换的“桥接模型”，不是重新训练出的模型。
+这里生成的 Keras 模型用于 TFLite 转换，不进行重新训练。
 """
 
 from __future__ import annotations
@@ -42,7 +42,7 @@ if TYPE_CHECKING:
     # 因未安装 convert 可选依赖而在模块导入阶段失败。
     from keras import Model
 
-# 报告格式单独维护版本号，后续增加字段时可以判断旧报告是否仍兼容。
+# 独立版本号用于识别报告格式。
 KERAS_EXPORT_FORMAT_VERSION = 1
 # 模型文件与报告都放在 ignored 的生成物目录中，避免二进制模型误提交到 Git。
 DEFAULT_KERAS_MODEL_PATH = Path("models/exported/best_model.keras")
@@ -189,7 +189,7 @@ def _compare_logits(
 
 
 def _sha256(path: Path) -> str:
-    """计算文件 SHA-256，供后续量化和部署报告关联精确模型版本。"""
+    """计算文件 SHA-256，用于关联量化和部署报告中的模型版本。"""
     digest = hashlib.sha256()
     with path.open("rb") as stream:
         # 分块读取，避免未来模型变大时一次性加载整个文件。
@@ -299,7 +299,7 @@ def export_checkpoint_to_keras(
     finally:
         temporary_model_path.unlink(missing_ok=True)
 
-    # 哈希绑定“实际落盘文件”，后续 TFLite/INT8 报告可据此确认输入模型版本。
+    # 哈希取自落盘文件，TFLite/INT8 报告据此确认输入模型版本。
     model_sha256 = _sha256(destination)
     result = KerasExportResult(
         model_path=destination,

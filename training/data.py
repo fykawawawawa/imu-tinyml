@@ -7,8 +7,8 @@
 * ``label`` 是 ``int64`` 标量，并已从官方的 ``1～6`` 转换为交叉熵所需的 ``0～5``；
 * ``subject`` 是 ``int64`` 标量，保留官方受试者编号。
 
-九路信号的顺序与 :mod:`feature_ref.feature_schema` 中的 ``REQUIRED_CHANNELS`` 完全一致，
-后续特征提取代码可通过通道名称和该顺序进行一一映射。
+九路信号的顺序与 :mod:`feature_ref.feature_schema` 中的 ``REQUIRED_CHANNELS`` 一致，
+特征提取按该顺序映射通道名称。
 """
 
 from __future__ import annotations
@@ -284,8 +284,7 @@ def split_dataset_by_subject(
 def _seed_worker(worker_id: int) -> None:
     """为每个 DataLoader 工作进程设置 NumPy 随机种子。
 
-    当前 Dataset 本身没有随机变换，但提前固定种子可以保证后续加入数据增强后，多进程
-    加载仍然可复现。PyTorch 会在调用本函数前为每个工作进程设置不同的 initial_seed。
+    PyTorch 会在调用本函数前为每个工作进程设置不同的 initial_seed。
     """
     del worker_id  # 工作进程差异已经包含在 torch.initial_seed() 中。
     np.random.seed(torch.initial_seed() % (2**32))
@@ -311,7 +310,7 @@ def _make_data_loader(
         num_workers=num_workers,
         pin_memory=pin_memory,
         drop_last=drop_last,
-        # 只有训练集会打乱，但三个加载器都传入 generator，使未来随机变换行为一致。
+        # 三个加载器共用确定性随机数配置；只有训练集打乱顺序。
         generator=generator,
         worker_init_fn=_seed_worker,
         # 没有工作进程时 PyTorch 不允许 persistent_workers=True。

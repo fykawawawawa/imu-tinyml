@@ -113,7 +113,7 @@ class ProcessedFeatureDataset(Dataset[tuple[Tensor, Tensor, Tensor]]):
 class StandardizationParameters:
     """训练子集拟合得到的逐特征标准化参数。
 
-    ``mean`` 和 ``scale`` 均使用 float64 保存，以便检查点及后续 C++/量化转换阶段拥有
+    ``mean`` 和 ``scale`` 均使用 float64 保存，使检查点及 C++/量化转换阶段拥有
     足够精度。实际转换结果会统一输出 float32，与 MLP 输入类型一致。
     """
 

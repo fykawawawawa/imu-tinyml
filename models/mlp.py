@@ -20,7 +20,7 @@ class TinyMLP(nn.Module):
     """使用 39 维窗口特征进行六分类的轻量 MLP。
 
     结构为 ``39 -> 32 -> 16 -> 6``，默认共 1,910 个可训练参数。模型返回
-    未归一化 logits，以同时兼容 PyTorch 训练和后续的 TFLite/TFLM 转换。
+    未归一化 logits，供 PyTorch 训练及 TFLite/TFLM 转换使用。
     """
 
     def __init__(

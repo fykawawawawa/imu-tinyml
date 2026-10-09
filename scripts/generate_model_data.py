@@ -36,7 +36,7 @@ def _format_model_bytes(data: bytes) -> str:
     ``    0x20, 0x00, 0xff,``
 
     每个值末尾都保留逗号；C++ 允许初始化列表的最后一个元素带尾随逗号，因此最后一行
-    不需要单独处理，后续重新生成模型时也能得到更整洁、稳定的代码差异。
+    不需要单独处理，重新生成模型时也能得到稳定的代码差异。
     """
     # 先保存每一行的文本，最后一次性用 LF 连接。这样不会在循环中反复拼接越来越长的
     # 字符串，也能由调用方统一控制整个生成文件末尾的换行。
@@ -77,7 +77,7 @@ def generate_model_data(
         raise ValueError(f"TFLite model is empty: {model_path}")
 
     # alignas(16) 为模型首地址提供稳定对齐，满足桌面 TFLM 访问 FlatBuffer 时的对齐
-    # 要求，也便于后续迁移到对齐要求更严格的嵌入式平台。
+    # 要求，并兼容对齐要求更严格的嵌入式平台。
     source = f"""\
 #include "model_data.h"
 

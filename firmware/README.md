@@ -23,10 +23,10 @@ firmware/
 │   │   ├── tflm_interpreter.h        MicroInterpreter 初始化和访问接口
 │   │   ├── inference_runner.h        单样本推理接口和结果结构
 │   │   └── golden_vectors.h          六类 Golden Vector 数据声明
-│   ├── features/.gitkeep             预留：C++ 特征提取接口
-│   ├── filters/.gitkeep              预留：滤波和重力分离接口
-│   ├── imu/.gitkeep                  预留：IMU 采样、窗口和缓冲接口
-│   └── platform/.gitkeep             预留：MCU/操作系统平台适配接口
+│   ├── features/.gitkeep             未实现：C++ 特征提取接口
+│   ├── filters/.gitkeep              未实现：滤波和重力分离接口
+│   ├── imu/.gitkeep                  未实现：IMU 采样、窗口和缓冲接口
+│   └── platform/.gitkeep             未实现：MCU/操作系统平台适配接口
 ├── src/
 │   ├── model_loader_main.cc          功能测试和 Golden Vector 验证入口
 │   ├── arena_profiler_main.cc        tensor arena 分配分析入口
@@ -36,11 +36,11 @@ firmware/
 │   │   ├── tflm_interpreter.cc       resolver、arena、解释器和张量契约
 │   │   ├── inference_runner.cc       输入量化、Invoke、输出处理和分类
 │   │   └── golden_vectors.cc         六类 Golden Vector 数据定义
-│   ├── features/.gitkeep             预留：C++ 特征提取实现
-│   ├── filters/.gitkeep              预留：滤波实现
-│   ├── imu/.gitkeep                  预留：传感器与滑动窗口实现
-│   └── platform/.gitkeep             预留：板级实现
-└── third_party/.gitkeep              预留；TFLM 当前由外部源码树提供
+│   ├── features/.gitkeep             未实现：C++ 特征提取
+│   ├── filters/.gitkeep              未实现：滤波
+│   ├── imu/.gitkeep                  未实现：传感器与滑动窗口
+│   └── platform/.gitkeep             未实现：板级适配
+└── third_party/.gitkeep              TFLM 由外部源码树提供
 ```
 
 ## 分层与文件职责
@@ -252,11 +252,11 @@ ctest --test-dir build/tflm-cmake --output-on-failure
 模型数组、Golden Vector 和 `model_contract.h` 当前不是单一脚本原子生成；提交前必须确认
 三者来自同一 `.tflite` 文件，避免模型与硬编码契约失配。
 
-## 当前边界与后续目录
+## 实现边界
 
-- `features/`、`filters/`、`imu/` 和 `platform/` 目前只有占位文件；
+- `features/`、`filters/`、`imu/` 和 `platform/` 只有目录占位文件；
 - 当前“端到端”从已标准化 39 维特征开始，不是从六轴 IMU 原始采样开始；
 - 当前没有 MCU 交叉编译、启动文件、链接脚本、传感器驱动或动态频率调节实现；
 - host 上测得的 arena 和延迟不能直接代表真实 MCU 的 RAM、Flash、延迟或功耗；
-- 若后续接入 MCU，应保持 `model_loader`、`tflm_interpreter` 和 `inference_runner` 接口，
-  在预留目录中补充传感器、滤波、特征和平台适配层。
+- 接入 MCU 时可复用 `model_loader`、`tflm_interpreter` 和 `inference_runner`，并另行实现
+  传感器、滤波、特征提取和平台适配层。

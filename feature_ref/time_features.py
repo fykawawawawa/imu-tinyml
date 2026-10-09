@@ -1,8 +1,8 @@
 """单个 IMU 窗口的基础时域特征计算。
 
 本模块只实现与具体数据集文件布局无关的数学运算，不负责决定窗口长度或特征拼接
-顺序。所有入口先将数据转换为 float64 并检查有限性，从而让本文件成为后续 C++ 特征
-实现的高精度参考。最终模型需要的 float32 转换统一由 ``extractor.py`` 完成。
+顺序。所有入口先将数据转换为 float64 并检查有限性；最终模型需要的 float32 转换统一
+由 ``extractor.py`` 完成。本模块也可作为 C++ 特征实现的数值参考。
 
 数值约定：标准差使用总体标准差（``ddof=0``）；相关系数遇到零方差信号时返回 0；
 所有函数都拒绝 NaN、正无穷和负无穷。
@@ -29,7 +29,7 @@ def as_float64_vector(values: ArrayLike, *, name: str = "signal") -> FloatArray:
         name: 仅用于异常信息，通常传入实际通道名以便定位坏数据。
 
     返回：
-        一维 float64 NumPy 数组。本函数及后续统计函数都不会修改其内容。
+        一维 float64 NumPy 数组。本函数及其他统计函数都不会修改其内容。
 
     异常：
         ValueError: 输入不是一维、长度为零，或包含 NaN/Inf。
@@ -63,7 +63,7 @@ def axis_statistics(values: ArrayLike) -> tuple[float, float, float, float]:
     signal = as_float64_vector(values)
     return (
         float(np.mean(signal)),
-        # ddof=0 表示总体标准差，必须与后续 C++ 实现保持一致。
+        # ddof=0 表示总体标准差；C++ 实现必须使用相同定义。
         float(np.std(signal, ddof=0)),
         float(np.mean(np.abs(signal))),
         float(np.ptp(signal)),

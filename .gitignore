@@ -33,7 +33,7 @@ models/*.tflite
 models/*.keras
 models/*.h5
 
-# Keep directory placeholders and documentation
+# 保留目录结构和说明文件
 !data/raw/.gitkeep
 !data/raw/README.md
 !data/processed/.gitkeep

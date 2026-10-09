@@ -38,7 +38,7 @@ def _validated_window(signals: Mapping[str, ArrayLike]) -> dict[str, NDArray[np.
     """检查输入通道并构造内部计算窗口。
 
     必需的 9 个键由 ``REQUIRED_CHANNELS`` 定义。每个值必须是一维、恰好 128 点且全部
-    有限。映射中的额外键会被忽略，便于调用方携带标签或其他尚未使用的传感器通道。
+    有限。映射中的额外键会被忽略。
 
     返回的新字典只包含必需通道，值统一为 float64 数组。缺少键时抛出 KeyError；数据
     维度、长度或有限性不符合要求时抛出 ValueError。
@@ -80,7 +80,7 @@ def extract_features(signals: Mapping[str, ArrayLike]) -> FeatureVector:
 
     数值约定：
         中间计算采用 float64，最后一次性转换为 float32。这样既保留 Python 参考实现的
-        计算稳定性，又使输出直接匹配 MLP 输入和后续嵌入式实现的数据类型。
+        计算稳定性，并使输出直接匹配 MLP 输入及嵌入式实现的数据类型。
     """
     window = _validated_window(signals)
     features: list[float] = []

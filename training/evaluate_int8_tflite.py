@@ -8,7 +8,7 @@
 * ``confusion_matrix.png``：INT8 模型的混淆矩阵热力图；
 * ``evaluation.log``：本次测试集评估的完整文本摘要。
 
-测试集仅用于最终评估，不参与校准，也不用于选择后续裁剪范围。
+测试集仅用于最终评估，不参与校准或裁剪范围选择。
 """
 
 from __future__ import annotations

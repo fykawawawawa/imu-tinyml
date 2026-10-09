@@ -3,8 +3,8 @@
 TensorFlow Lite Converter 不能直接把已有 ``.tflite`` FlatBuffer 作为再次转换的输入，
 因此量化仍从已经对齐的 Keras 桥接模型开始；现有 FP32 TFLite 模型作为数值和分类基线。
 
-默认 ``raw`` 校准策略原样使用全部标准化训练特征。``InputCalibrationPolicy`` 同时预留
-``clip`` 策略，使后续可以在不改动转换、验证和报告流程的情况下比较不同裁剪上下界。
+默认 ``raw`` 校准策略使用全部标准化训练特征。``clip`` 策略允许指定统一的输入裁剪
+上下界，并沿用相同的转换、验证和报告流程。
 """
 
 from __future__ import annotations

@@ -1,7 +1,6 @@
 # Data
 
-数据目录仅保留结构和说明。数据集不会提交到 Git。
+数据集和处理结果保存在本地，不提交到 Git；仓库只保留目录说明。
 
 - `raw/`：原始 UCI HAR 数据。
-- `processed/`：特征、标签、标准化参数和数据划分结果。
-
+- `processed/`：由 `python -m training.preprocess` 生成的特征、标签、标准化参数和划分元数据。

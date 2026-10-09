@@ -3,7 +3,7 @@
 本模块不启用任何量化或优化选项，保留 float32 输入、权重、激活和 logits 输出。
 导出后重新加载 TFLite FlatBuffer，并在官方测试特征上与 Keras 模型逐项比较。
 
-该 FP32 TFLite 模型有两个用途：一是作为后续 INT8 量化的精度基线，二是隔离
+该 FP32 TFLite 模型有两个用途：一是作为 INT8 量化的精度基线，二是隔离
 “框架转换误差”和“量化误差”。因此本模块会严格检查 Keras 结构、TFLite 张量契约、
 算子列表、逐项 logits 误差以及最终分类结果，不把“成功生成文件”等同于转换成功。
 """
@@ -350,7 +350,7 @@ def export_keras_to_float_tflite(
         # 验证成功前不替换已有模型；失败时只清理本次生成的候选文件。
         verification_path.unlink(missing_ok=True)
 
-    # 阶段 4：对最终文件计算哈希并生成自描述报告，供后续 INT8 转换追踪来源。
+    # 阶段 4：对最终文件计算哈希并生成报告，供 INT8 转换追踪来源。
     model_sha256 = _sha256(destination)
     result = FloatTFLiteExportResult(
         model_path=destination,
