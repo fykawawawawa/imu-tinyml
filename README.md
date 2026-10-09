@@ -16,7 +16,7 @@ TensorFlow Lite 模型，在桌面端通过 TensorFlow Lite Micro 验证推理�
 | 浮点 TFLite | 已完成 | Keras 到 FP32 FlatBuffer 转换及全测试集 logits 对齐 |
 | INT8 基线 | 已完成 | 使用全部原始标准化训练输入校准全 INT8 模型 |
 | 裁剪校准 | 待比较 | 已预留统一上下界策略，后续比较 `±8`、`±6` 等方案 |
-| TFLM 推理 | 待完成 | 桌面端 MicroInterpreter 和静态 tensor arena 验证 |
+| TFLM 推理 | 已完成（桌面） | MicroInterpreter、静态 arena 和六类 Golden Vector 的 INT8 输出已验证 |
 
 核心流程：
 

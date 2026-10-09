@@ -1,15 +1,32 @@
+# Compose 服务定义。一个服务描述一种需要创建和运行的容器。
 services:
+  # 桌面端 TensorFlow Lite Micro（TFLM）开发与测试环境。
   tflm:
+    # TFLM 官方 CI 工具链镜像；固定版本可避免上游更新破坏复现。
     image: ghcr.io/tflm-bot/tflm-ci:0.6.7
+
+    # 进入容器后默认所在目录，对应下面挂载的 Windows 项目根目录。
     working_dir: /workspace
+
+    # 使用轻量 init 进程转发信号并回收子进程，避免产生僵尸进程。
     init: true
+
+    # 保留标准输入和伪终端，使 bash 等交互式命令可以正常使用。
     stdin_open: true
     tty: true
+
+    # 将主机项目和持久化的 TFLM 源码挂载到容器中。
     volumes:
+      # 当前目录（E:\job_code\IMU-process）与 /workspace 双向同步。
       - .:/workspace
+      # Docker 命名卷保存 TFLM 源码及其构建缓存，删除容器后仍保留。
       - tflm-source:/opt/tflm
+
+    # 常驻容器没有前台应用，因此用 sleep 保持运行，供 compose exec 进入。
     command: ["sleep", "infinity"]
 
+# 声明服务使用的 Docker 命名卷。
 volumes:
   tflm-source:
+    # 固定实际卷名，避免因项目目录名变化而生成不同的卷。
     name: imu-process-tflm-source
