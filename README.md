@@ -1,8 +1,8 @@
 # IMU TinyML HAR
 
 面向资源受限设备的 IMU 人体活动识别项目。项目使用 UCI HAR 的窗口信号提取 39 维
-轻量时域特征，训练 `39 -> 32 -> 16 -> 6` 的 PyTorch MLP，并计划转换为全 INT8
-TensorFlow Lite 模型，在桌面端通过 TensorFlow Lite Micro 验证推理流程。
+轻量时域特征，训练 `39 -> 32 -> 16 -> 6` 的 PyTorch MLP，将模型转换为全 INT8
+TensorFlow Lite，并在桌面端通过 TensorFlow Lite Micro 完成推理验证。
 
 ## 当前状态
 
@@ -31,6 +31,28 @@ TensorFlow Lite 模型，在桌面端通过 TensorFlow Lite Micro 验证推理�
     -> INT8 TFLite
     -> TFLM 推理
 ```
+
+## 结果摘要
+
+分类指标来自 UCI HAR 官方测试集（2,947 个窗口、9 名未参与训练的受试者）。INT8 校准
+仅使用训练分区；官方测试集不参与校准或模型选择。
+
+| 指标 | FP32 TFLite | 全 INT8 TFLite | INT8 - FP32 |
+| --- | ---: | ---: | ---: |
+| Accuracy | 87.24% | **87.44%** | +0.20 个百分点 |
+| Macro-F1 | 87.03% | **87.24%** | +0.21 个百分点 |
+| 模型大小 | 9,580 bytes | **5,600 bytes** | **-41.54%** |
+
+- 模型结构：`39 -> 32 -> 16 -> 6`，共 1,910 个可训练参数；
+- FP32 与 INT8 的测试集预测一致率：97.76%（66/2,947 个样本发生变化）；
+- Keras 与 FP32 TFLite 的测试集预测一致率：100%；
+- 桌面 TFLM 六类 Golden Vector 全部通过，INT8 输出误差不超过 1 LSB；
+- TFLM tensor arena 实际分配 1,888 bytes，当前静态预留 2,304 bytes；
+- 桌面 host benchmark 的 `Invoke()` P50 为 1.182 us，当前推理 runner P50 为 1.302 us。
+
+INT8 准确率的轻微上升属于该次量化结果，不代表量化通常会提升精度。arena 和延迟均来自
+固定 TFLM 版本下的桌面 Docker 环境，不代表真实 MCU 的 RAM 或运行时间。完整测量口径见
+[`benchmark/host_latency.md`](benchmark/host_latency.md)。
 
 ## 快速开始
 
@@ -133,6 +155,20 @@ python -m ruff check feature_ref models training tests
 [UCI Human Activity Recognition Using Smartphones](https://archive.ics.uci.edu/dataset/240/human%2Bactivity%2Brecognition%2Busing%2Bsmartphones)
 包含 30 名受试者的六类日常活动。手机固定在腰部，以 50 Hz 采集三轴加速度和三轴角速度；
 数据被切分为 2.56 秒、50% 重叠的窗口，因此每个通道每个窗口包含 128 个采样点。
+
+### 下载
+
+- 数据集主页：[UCI HAR 数据集说明与引用信息](https://archive.ics.uci.edu/dataset/240/human%2Bactivity%2Brecognition%2Busing%2Bsmartphones)
+- 官方压缩包：[human activity recognition using smartphones.zip](https://archive.ics.uci.edu/static/public/240/human+activity+recognition+using+smartphones.zip)
+- 外层压缩包 SHA-256：`C00B803081A5C797CD5E4B83700A9810B38D53D9D84E01917E090E1FDBC81031`
+
+官方压缩包中还包含 `UCI HAR Dataset.zip`。将内层压缩包解压到以下位置：
+
+```text
+data/raw/UCI HAR Dataset/
+```
+
+数据文件不提交到本仓库；使用数据集时请遵循 UCI 页面列出的许可条款并引用原作者。
 
 ### 信号
 
@@ -239,3 +275,8 @@ scripts/        环境、训练、转换和验证入口
 当前项目尚未在真实 MCU 上部署。后续桌面端 TFLM 结果只代表 host simulation，不能作为
 真实板端延迟、RAM、Flash、功耗或动态频率表现。数据来自腰部固定手机和受控实验环境，
 模型结果也不能直接代表手腕、鞋部或自由放置设备上的效果。
+
+## License
+
+本项目自行编写的源代码采用 [MIT License](LICENSE)。UCI HAR 数据集、TensorFlow Lite
+Micro 及其他第三方组件分别受其各自许可证约束，不因本仓库的 MIT License 而改变。
